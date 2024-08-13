@@ -78,8 +78,9 @@ TEST_MODE=false
 ARCH=""
 VERSION=""
 VERSION_FILE=""
+GIT=""
 
-while getopts 'tc:k:d:l:pa:n:f:' flag; do
+while getopts 'tc:k:d:l:pa:g:n:f:' flag; do
 	case "$flag" in
 	c) CACHE_PATH="$OPTARG" ;;
 	k) CACHE_KEY="$OPTARG" ;;
@@ -88,6 +89,7 @@ while getopts 'tc:k:d:l:pa:n:f:' flag; do
 	p) PRINT_ONLY=true ;;
 	t) TEST_MODE=true ;;
 	a) ARCH="$(echo "$OPTARG" | awk '{print tolower($0)}')" ;;
+	g) GIT="$OPTARG" ;;
 	n) VERSION="$OPTARG" ;;
 	f)
 		VERSION_FILE="$OPTARG"
@@ -116,6 +118,7 @@ CHANNEL="${ARR_CHANNEL[0]:-}"
 
 [ -z "$CHANNEL" ] && CHANNEL=stable
 [ -z "$VERSION" ] && VERSION=any
+[ -z "$GIT" ] && GIT="https://github.com/flutter/flutter.git"
 [ -z "$ARCH" ] && ARCH=x64
 [ -z "$CACHE_PATH" ] && CACHE_PATH="$RUNNER_TOOL_CACHE/flutter/:channel:-:version:-:arch:"
 [ -z "$CACHE_KEY" ] && CACHE_KEY="flutter-:os:-:channel:-:version:-:arch:-:hash:"
@@ -188,6 +191,7 @@ if [ "$PRINT_ONLY" = true ]; then
 	if [ "$TEST_MODE" = true ]; then
 		echo "CHANNEL=$info_channel"
 		echo "VERSION=$info_version"
+		echo "GIT=$GIT"
 		# VERSION_FILE is not printed, because it is essentially same as VERSION
 		echo "ARCHITECTURE=$info_architecture"
 		echo "CACHE-KEY=$CACHE_KEY"
@@ -200,6 +204,7 @@ if [ "$PRINT_ONLY" = true ]; then
 	{
 		echo "CHANNEL=$info_channel"
 		echo "VERSION=$info_version"
+		echo "GIT=$GIT"
 		# VERSION_FILE is not printed, because it is essentially same as VERSION
 		echo "ARCHITECTURE=$info_architecture"
 		echo "CACHE-KEY=$CACHE_KEY"
@@ -213,7 +218,7 @@ fi
 
 if [ ! -x "$CACHE_PATH/bin/flutter" ]; then
 	if [ "$CHANNEL" = "master" ] || [ "$CHANNEL" = "main" ]; then
-		git clone -b "$CHANNEL" https://github.com/flutter/flutter.git "$CACHE_PATH"
+		git clone -b "$CHANNEL" "$GIT" "$CACHE_PATH"
 		if [ "$VERSION" != "any" ]; then
 			git config --global --add safe.directory "$CACHE_PATH"
 			(cd "$CACHE_PATH" && git checkout "$VERSION")

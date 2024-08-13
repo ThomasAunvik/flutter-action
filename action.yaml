@@ -18,6 +18,10 @@ inputs:
     description: The pubspec.yaml file with exact Flutter version defined
     required: false
     default: ""
+  git:
+    description: Custom repository to fetch if channel is any/master/ref
+    required: false
+    default: ""
   architecture:
     description: The architecture of Flutter SDK executable (x64 or arm64)
     required: false
@@ -84,6 +88,7 @@ runs:
         $GITHUB_ACTION_PATH/setup.sh -p \
           -n '${{ inputs.flutter-version }}' \
           -f '${{ inputs.flutter-version-file }}' \
+          -g '${{ inputs.git }}' \
           -a '${{ inputs.architecture }}' \
           -k '${{ inputs.cache-key }}' \
           -c '${{ inputs.cache-path }}' \
